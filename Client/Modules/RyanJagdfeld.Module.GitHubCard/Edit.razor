@@ -1,0 +1,148 @@
+@using Oqtane.Modules.Controls
+@using RyanJagdfeld.Module.GitHubCard.Services
+@using RyanJagdfeld.Module.GitHubCard.Models
+
+@namespace RyanJagdfeld.Module.GitHubCard
+@inherits ModuleBase
+@inject IGitHubCardService GitHubCardService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Edit> Localizer
+
+<form @ref="form" class="@(validated ? " was-validated" : "needs-validation" )" novalidate>
+    <div class="container">
+        <div class="row mb1">
+            <Label Class="col-md-3" For="entry" HelpText="Please enter the github username or the username/repo you would like this card to display." ResourceKey="Theme">Username or Repo: </Label>
+            <div class="col-md-8">
+                <input id="entry" class="form-control" @bind="@_entry" required placeholder="username or username/repo" />
+            </div>
+        </div>
+        <div class="row mb-2">
+            <Label Class="col-md-3" For="theme" HelpText="Select the theme for this card" ResourceKey="Theme">Theme: </Label>
+            <div class="col-md-8">
+                <select id="theme" class="form-control" @bind="_theme">
+                    <option value="default" selected>default</option>
+                    <option value="medium">medium</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-success" @onclick="Save">@Localizer["Save"]</button>
+    <NavLink class="btn btn-secondary" href="@NavigateUrl()">@Localizer["Cancel"]</NavLink>
+    <br /><br />
+    @if (PageState.Action == "Edit")
+    {
+    <AuditInfo CreatedBy="@_createdby" CreatedOn="@_createdon" ModifiedBy="@_modifiedby" ModifiedOn="@_modifiedon"></AuditInfo>
+    }
+</form>
+
+@code {
+    public override SecurityAccessLevel SecurityAccessLevel => SecurityAccessLevel.Edit;
+
+    public override string Actions => "Add,Edit";
+
+    public override string Title => "Manage GitHubCard";
+
+    public override List<Resource> Resources => new List<Resource>()
+    {
+        new Resource { ResourceType = ResourceType.Stylesheet, Url = ModulePath() + "Module.css" }
+    };
+
+    private ElementReference form;
+    private bool validated = false;
+
+    private int _id;
+    private string _entry;
+    private string _username;
+    private string _repo;
+    private string _theme = "default";
+    private string _createdby;
+    private DateTime _createdon;
+    private string _modifiedby;
+    private DateTime _modifiedon;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (PageState.Action == "Edit")
+            {
+                _id = Int32.Parse(PageState.QueryString["id"]);
+                GitHubCard GitHubCard = await GitHubCardService.GetGitHubCardAsync(_id, ModuleState.ModuleId);
+                if (GitHubCard != null)
+                {
+                    _entry = GitHubCard.Repo != null ? $"{GitHubCard.Username}/{GitHubCard.Repo}" : GitHubCard.Username;
+                    _theme = GitHubCard.Theme;
+                    _createdby = GitHubCard.CreatedBy;
+                    _createdon = GitHubCard.CreatedOn;
+                    _modifiedby = GitHubCard.ModifiedBy;
+                    _modifiedon = GitHubCard.ModifiedOn;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await logger.LogError(ex, "Error Loading GitHubCard {GitHubCardId} {Error}", _id, ex.Message);
+            AddModuleMessage(Localizer["Message.LoadError"], MessageType.Error);
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            validated = true;
+            var interop = new Oqtane.UI.Interop(JSRuntime);
+            if (await interop.FormValid(form))
+            {
+                string[] parts = _entry.Split('/');
+                if (parts.Length == 1)
+                {
+                    _username = parts[0];
+                    _repo = null;
+                }
+                else if (parts.Length == 2)
+                {
+                    _username = parts[0];
+                    _repo = parts[1];
+                }
+                else
+                {
+                    AddModuleMessage(Localizer["Message.IncorrectEntry"], MessageType.Warning);
+                    return;
+                }
+
+                _theme = _theme ?? "default";
+
+                if (PageState.Action == "Add")
+                {
+                    GitHubCard GitHubCard = new GitHubCard();
+                    GitHubCard.ModuleId = ModuleState.ModuleId;
+                    GitHubCard.Username = _username;
+                    GitHubCard.Repo = _repo;
+                    GitHubCard.Theme = _theme;
+                    GitHubCard = await GitHubCardService.AddGitHubCardAsync(GitHubCard);
+                    await logger.LogInformation("GitHubCard Added {GitHubCard}", GitHubCard);
+                }
+                else
+                {
+                    GitHubCard GitHubCard = await GitHubCardService.GetGitHubCardAsync(_id, ModuleState.ModuleId);
+                    GitHubCard.Username = _username;
+                    GitHubCard.Repo = _repo;
+                    GitHubCard.Theme = _theme;
+                    await GitHubCardService.UpdateGitHubCardAsync(GitHubCard);
+                    await logger.LogInformation("GitHubCard Updated {GitHubCard}", GitHubCard);
+                }
+                NavigationManager.NavigateTo(NavigateUrl());
+            }
+            else
+            {
+                AddModuleMessage(Localizer["Message.SaveValidation"], MessageType.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            await logger.LogError(ex, "Error Saving GitHubCard {Error}", ex.Message);
+            AddModuleMessage(Localizer["Message.SaveError"], MessageType.Error);
+        }
+    }
+}

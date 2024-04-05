@@ -1,0 +1,100 @@
+@using RyanJagdfeld.Module.GitHubCard.Services
+@using RyanJagdfeld.Module.GitHubCard.Models
+
+@namespace RyanJagdfeld.Module.GitHubCard
+@inherits ModuleBase
+@inject IGitHubCardService GitHubCardService
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<Index> Localizer
+
+@if (_GitHubCards == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <ActionLink Action="Add" Security="SecurityAccessLevel.Edit" Text="Add GitHubCard" ResourceKey="Add" />
+    <br />
+    <br />
+    @if (@_GitHubCards.Count != 0)
+    {
+        <Pager Items="@_GitHubCards" Format="Grid">
+            <Row>
+                <div class="github-card" data-github="@FullEntry(context)" data-width="400" data-height="" data-theme="@context.Theme"></div>
+                <div class="m-auto">
+                    <ActionLink Action="Edit" Parameters="@($"id=" + context.GitHubCardId.ToString())" ResourceKey="Edit"  />
+                    <ActionDialog Header="Delete GitHubCard" Message="Are You Sure You Wish To Delete This GitHubCard?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete" Id="@context.GitHubCardId.ToString()" />
+                </div>
+            </Row>
+        </Pager>
+
+        @if (PageState.RenderMode == RenderModes.Static)
+        {
+            <!-- GitHub Card Main JS File -->
+            <script src="//cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
+        }
+
+    }
+    else
+    {
+        <p>@Localizer["Message.DisplayNone"]</p>
+    }
+}
+
+@code {
+    // uncomment the following line to use Static render mode for this component
+    //public override string RenderMode => RenderModes.Static;
+
+    public override List<Resource> Resources => new List<Resource>()
+    {
+        new Resource { ResourceType = ResourceType.Stylesheet, Url = ModulePath() + "Module.css" },
+        new Resource { ResourceType = ResourceType.Script, Url = ModulePath() + "Module.js" }
+    };
+
+    List<GitHubCard> _GitHubCards;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _GitHubCards = await GitHubCardService.GetGitHubCardsAsync(ModuleState.ModuleId);
+        }
+        catch (Exception ex)
+        {
+            await logger.LogError(ex, "Error Loading GitHubCard {Error}", ex.Message);
+            AddModuleMessage(Localizer["Message.LoadError"], MessageType.Error);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && PageState.RenderMode == RenderModes.Interactive)
+        {
+            var interop = new Oqtane.UI.Interop(JSRuntime);
+            await interop.IncludeScript("githubcard", $"//cdn.jsdelivr.net/github-cards/latest/widget.js", "", "", "", "head");
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task Delete(GitHubCard GitHubCard)
+    {
+        try
+        {
+            await GitHubCardService.DeleteGitHubCardAsync(GitHubCard.GitHubCardId, ModuleState.ModuleId);
+            await logger.LogInformation("GitHubCard Deleted {GitHubCard}", GitHubCard);
+            _GitHubCards = await GitHubCardService.GetGitHubCardsAsync(ModuleState.ModuleId);
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await logger.LogError(ex, "Error Deleting GitHubCard {GitHubCard} {Error}", GitHubCard, ex.Message);
+            AddModuleMessage(Localizer["Message.DeleteError"], MessageType.Error);
+        }
+    }
+
+    private string FullEntry(GitHubCard GitHubCard)
+    {
+        return GitHubCard.Repo != null ? $"{GitHubCard.Username}/{GitHubCard.Repo}" : GitHubCard.Username;
+    }
+}
