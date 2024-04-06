@@ -21,7 +21,7 @@ else
     {
         <Pager Items="@_GitHubCards" Format="Grid" ColumnClass="@_columnClasses">
             <Row>
-                <div class="github-card" data-github="@FullEntry(context)" data-width="400" data-height="" data-theme="@context.Theme"></div>
+                <div class="github-card" data-github="@FullEntry(context)" data-width="@context.Width" data-height="@context.Height" data-theme="@context.Theme"></div>
                 <div class="m-auto">
                     <ActionLink Action="Edit" Parameters="@($"id=" + context.GitHubCardId.ToString())" ResourceKey="Edit"  />
                     <ActionDialog Header="Delete GitHubCard" Message="Are You Sure You Wish To Delete This GitHubCard?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete" Id="@context.GitHubCardId.ToString()" />

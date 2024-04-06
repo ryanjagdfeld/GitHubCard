@@ -141,4 +141,16 @@
   <data name="Message.IncorrectEntry" xml:space="preserve">
     <value>Please use only the username or username/repo.</value>
   </data>
+  <data name="Height.HelpText" xml:space="preserve">
+    <value>Enter the height of the card in pixels. Default is 200</value>
+  </data>
+  <data name="Height.Text" xml:space="preserve">
+    <value>Height</value>
+  </data>
+  <data name="Width.HelpText" xml:space="preserve">
+    <value>Enter the width of the card in pixels. Default is 400</value>
+  </data>
+  <data name="Width.Text" xml:space="preserve">
+    <value>Width</value>
+  </data>
 </root>
