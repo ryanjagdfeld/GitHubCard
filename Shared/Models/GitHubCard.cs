@@ -14,6 +14,8 @@ namespace RyanJagdfeld.Module.GitHubCard.Models
         public string Username { get; set; }
         public string Repo { get; set; }
         public string Theme { get; set; } = "default";
+        public int Height { get; set; } = 200;
+        public int Width { get; set; } = 400;
 
         public string CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }

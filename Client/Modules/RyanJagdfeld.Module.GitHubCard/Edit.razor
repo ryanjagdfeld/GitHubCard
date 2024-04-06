@@ -10,19 +10,31 @@
 
 <form @ref="form" class="@(validated ? " was-validated" : "needs-validation" )" novalidate>
     <div class="container">
-        <div class="row mb1">
+        <div class="row mb-1">
             <Label Class="col-md-3" For="entry" HelpText="Please enter the github username or the username/repo you would like this card to display." ResourceKey="Theme">Username or Repo: </Label>
             <div class="col-md-8">
                 <input id="entry" class="form-control" @bind="@_entry" required placeholder="username or username/repo" />
             </div>
         </div>
-        <div class="row mb-2">
+        <div class="row mb-1">
             <Label Class="col-md-3" For="theme" HelpText="Select the theme for this card" ResourceKey="Theme">Theme: </Label>
             <div class="col-md-8">
                 <select id="theme" class="form-control" @bind="_theme">
                     <option value="default" selected>default</option>
                     <option value="medium">medium</option>
                 </select>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <Label Class="col-md-3" For="height" HelpText="Enter the height of the card in pixels. Default is 200" ResourceKey="Height">Height: </Label>
+            <div class="col-md-8">
+                <input id="height" class="form-control" @bind="@_height" type="number" min="0" max="27456" />
+            </div>
+        </div>
+        <div class="row mb-1">
+            <Label Class="col-md-3" For="width" HelpText="Enter the width of the card in pixels. Default is 400" ResourceKey="Width">Width: </Label>
+            <div class="col-md-8">
+                <input id="width" class="form-control" @bind="@_width" type="number" min="0" max="13500" />
             </div>
         </div>
     </div>
@@ -56,6 +68,9 @@
     private string _repo;
     private string _theme = "default";
     private string _createdby;
+    private int _height = 200;
+    private int _width = 400;
+
     private DateTime _createdon;
     private string _modifiedby;
     private DateTime _modifiedon;
@@ -72,6 +87,8 @@
                 {
                     _entry = GitHubCard.Repo != null ? $"{GitHubCard.Username}/{GitHubCard.Repo}" : GitHubCard.Username;
                     _theme = GitHubCard.Theme;
+                    _height = GitHubCard.Height;
+                    _width = GitHubCard.Width;
                     _createdby = GitHubCard.CreatedBy;
                     _createdon = GitHubCard.CreatedOn;
                     _modifiedby = GitHubCard.ModifiedBy;
@@ -120,6 +137,8 @@
                     GitHubCard.Username = _username;
                     GitHubCard.Repo = _repo;
                     GitHubCard.Theme = _theme;
+                    GitHubCard.Height = _height;
+                    GitHubCard.Width = _width;
                     GitHubCard = await GitHubCardService.AddGitHubCardAsync(GitHubCard);
                     await logger.LogInformation("GitHubCard Added {GitHubCard}", GitHubCard);
                 }
@@ -129,6 +148,8 @@
                     GitHubCard.Username = _username;
                     GitHubCard.Repo = _repo;
                     GitHubCard.Theme = _theme;
+                    GitHubCard.Height = _height;
+                    GitHubCard.Width = _width;
                     await GitHubCardService.UpdateGitHubCardAsync(GitHubCard);
                     await logger.LogInformation("GitHubCard Updated {GitHubCard}", GitHubCard);
                 }
