@@ -9,9 +9,9 @@ namespace RyanJagdfeld.Module.GitHubCard
         {
             Name = "GitHubCard",
             Description = "A module for displaying GitHub cards by lepture.",
-            Version = "1.0.0",
+            Version = "1.0.1",
             ServerManagerType = "RyanJagdfeld.Module.GitHubCard.Manager.GitHubCardManager, RyanJagdfeld.Module.GitHubCard.Server.Oqtane",
-            ReleaseVersions = "1.0.0",
+            ReleaseVersions = "1.0.1",
             Dependencies = "RyanJagdfeld.Module.GitHubCard.Shared.Oqtane",
             PackageName = "RyanJagdfeld.Module.GitHubCard" 
         };
