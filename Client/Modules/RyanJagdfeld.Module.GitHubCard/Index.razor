@@ -6,6 +6,7 @@
 @inject IGitHubCardService GitHubCardService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<Index> Localizer
+@inject ISettingService SettingService
 
 @if (_GitHubCards == null)
 {
@@ -18,7 +19,7 @@ else
     <br />
     @if (@_GitHubCards.Count != 0)
     {
-        <Pager Items="@_GitHubCards" Format="Grid">
+        <Pager Items="@_GitHubCards" Format="Grid" ColumnClass="@_columnClasses">
             <Row>
                 <div class="github-card" data-github="@FullEntry(context)" data-width="400" data-height="" data-theme="@context.Theme"></div>
                 <div class="m-auto">
@@ -52,12 +53,14 @@ else
     };
 
     List<GitHubCard> _GitHubCards;
+    string _columnClasses;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             _GitHubCards = await GitHubCardService.GetGitHubCardsAsync(ModuleState.ModuleId);
+            _columnClasses = SettingService.GetSetting(ModuleState.Settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
         }
         catch (Exception ex)
         {
