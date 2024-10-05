@@ -19,7 +19,10 @@ namespace RyanJagdfeld.Module.GitHubCard
                 .Replace("{PublicRepos}", user.PublicRepos.ToString())
                 .Replace("{PublicGists}", user.PublicGists.ToString())
                 .Replace("{Followers}", user.Followers.ToString())
-                .Replace("{Username}", user.Login);
+                .Replace("{Username}", user.Login)
+                .Replace("{HtmlUrl}", user.HtmlUrl)
+                .Replace("{Bio}", user.Bio)
+                .Replace("{Location}", user.Location);
         }
 
         public static string DefaultTemplate()
@@ -48,7 +51,7 @@ namespace RyanJagdfeld.Module.GitHubCard
                             </div>
                         </div>
                         <div class='button mt-2 d-flex flex-row align-items-center'>
-                            <a href='https://github.com/{Username}' class='btn btn-sm btn-primary w-100 ml-2'>Follow</a>
+                            <a href='{HtmlUrl}' class='btn btn-sm btn-primary w-100 ml-2'>Follow</a>
                         </div>
                     </div>
                 </div>

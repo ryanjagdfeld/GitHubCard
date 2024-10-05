@@ -123,7 +123,10 @@
   <data name="ColumnClass.HelpText" xml:space="preserve">
     <value>Bootstrap classes for each column in the grid. NOTE: The card width can outgrow the box of the grid.</value>
   </data>
-  <data name="UserTemplate" xml:space="preserve">
+  <data name="UserTemplate.Text" xml:space="preserve">
     <value>User Template:</value>
+  </data>
+  <data name="UserTemplate.HelpText" xml:space="preserve">
+    <value>The User Template for creating the output HTML.  You can use and of the following tokens:  {AvatarUrl}, {Name}, {HireableText}, {PublicRepos}, {PublicGists}, {Followers}, {Username}, {HtmlUrl}, {Bio}, {Location}</value>
   </data>
 </root>

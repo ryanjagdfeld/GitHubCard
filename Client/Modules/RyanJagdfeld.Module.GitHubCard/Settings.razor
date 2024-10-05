@@ -12,6 +12,7 @@
         <Label Class="col-sm-3" For="userTemplate" HelpText="The template for displaying a GitHub User" ResourceKey="UserTemplate" ResourceType="@resourceType">User Template: </Label>
         <div class="col-sm-9">
             <textarea id="userTemplate" rows="8" cols="75" class="form-control" @bind="@_userTemplate" />
+            <button id="reloadUserDefault" class="btn btn-secondary" @onclick="ReloadDefaultTemplate">Reload Default</button>
         </div>
     </div>
 </div>
@@ -50,5 +51,10 @@
         {
             AddModuleMessage(ex.Message, MessageType.Error);
         }
+    }
+
+    private void ReloadDefaultTemplate()
+    {
+        _userTemplate = TemplateHelper.DefaultTemplate();
     }
 }
