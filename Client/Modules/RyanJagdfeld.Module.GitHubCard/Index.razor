@@ -4,6 +4,7 @@
 @namespace RyanJagdfeld.Module.GitHubCard
 @inherits ModuleBase
 @inject IGitHubCardService GitHubCardService
+@inject GitHubUserService GitHubUserService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<Index> Localizer
 @inject ISettingService SettingService
@@ -21,7 +22,7 @@ else
     {
         <Pager Items="@_GitHubCards" Format="Grid" ColumnClass="@_columnClasses">
             <Row>
-                <div class="github-card" data-github="@FullEntry(context)" data-width="@context.Width" data-height="@context.Height" data-theme="@context.Theme"></div>
+                @OutputTemplate(context)
                 <div class="m-auto">
                     <ActionLink Action="Edit" Parameters="@($"id=" + context.GitHubCardId.ToString())" ResourceKey="Edit"  />
                     <ActionDialog Header="Delete GitHubCard" Message="Are You Sure You Wish To Delete This GitHubCard?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete" Id="@context.GitHubCardId.ToString()" />
@@ -54,6 +55,7 @@ else
 
     List<GitHubCard> _GitHubCards;
     string _columnClasses;
+    string _userTemplate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,6 +63,16 @@ else
         {
             _GitHubCards = await GitHubCardService.GetGitHubCardsAsync(ModuleState.ModuleId);
             _columnClasses = SettingService.GetSetting(ModuleState.Settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
+            _userTemplate = SettingService.GetSetting(ModuleState.Settings, "UserTemplate", TemplateHelper.DefaultTemplate());
+            
+            foreach (var gitHubCard in _GitHubCards)
+            {
+                var gitHubUser = await GitHubUserService.GetGitHubUserAsync(gitHubCard.Username);
+                if (gitHubUser != null)
+                {
+                    gitHubCard.GitHubUser = gitHubUser;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -100,4 +112,22 @@ else
     {
         return GitHubCard.Repo != null ? $"{GitHubCard.Username}/{GitHubCard.Repo}" : GitHubCard.Username;
     }
+
+    private MarkupString OutputTemplate(GitHubCard GitHubCard)
+    {
+        return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, GitHubCard.GitHubUser, HireableText(GitHubCard.GitHubUser.Hireable)));
+    }
+
+    public string HireableText(bool? Hireable)
+    {
+            if (Hireable != null)
+            {
+                if ((bool)Hireable)
+                {
+                    return Localizer.GetString("Hireable");
+                }
+                return Localizer.GetString("NotHireable");
+            }
+            return string.Empty;
+        }
 }

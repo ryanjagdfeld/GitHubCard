@@ -123,4 +123,7 @@
   <data name="ColumnClass.HelpText" xml:space="preserve">
     <value>Bootstrap classes for each column in the grid. NOTE: The card width can outgrow the box of the grid.</value>
   </data>
+  <data name="UserTemplate" xml:space="preserve">
+    <value>User Template:</value>
+  </data>
 </root>
