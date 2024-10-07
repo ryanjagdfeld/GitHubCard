@@ -16,7 +16,10 @@
 }
 else
 {
-    <ActionLink Action="Add" Security="SecurityAccessLevel.Edit" Text="Add GitHubCard" ResourceKey="Add" />
+    @if (PageState.EditMode)
+    {
+        <ActionLink Action="Add" Security="SecurityAccessLevel.Edit" Text="Add GitHubCard" ResourceKey="Add" />
+    }
     <br />
     <br />
     @if (@_GitHubCards.Count != 0)
@@ -25,8 +28,11 @@ else
             <Row>
                 @OutputTemplate(context)
                 <div class="m-auto">
-                    <ActionLink Action="Edit" Parameters="@($"id=" + context.GitHubCardId.ToString())" ResourceKey="Edit"  />
-                    <ActionDialog Header="Delete GitHubCard" Message="Are You Sure You Wish To Delete This GitHubCard?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete" Id="@context.GitHubCardId.ToString()" />
+                    @if (PageState.EditMode)
+                    {
+                        <ActionLink Action="Edit" Parameters="@($"id=" + context.GitHubCardId.ToString())" ResourceKey="Edit" Security="SecurityAccessLevel.Edit" />
+                        <ActionDialog Header="Delete GitHubCard" Message="Are You Sure You Wish To Delete This GitHubCard?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete" Id="@context.GitHubCardId.ToString()" />
+                    }
                 </div>
             </Row>
         </Pager>
