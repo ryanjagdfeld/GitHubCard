@@ -4,6 +4,8 @@
 @namespace RyanJagdfeld.Module.GitHubCard
 @inherits ModuleBase
 @inject IGitHubCardService GitHubCardService
+@inject GitHubUserService GitHubUserService
+@inject GitHubRepoService GitHubRepoService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<Index> Localizer
 @inject ISettingService SettingService
@@ -21,20 +23,13 @@ else
     {
         <Pager Items="@_GitHubCards" Format="Grid" ColumnClass="@_columnClasses">
             <Row>
-                <div class="github-card" data-github="@FullEntry(context)" data-width="@context.Width" data-height="@context.Height" data-theme="@context.Theme"></div>
+                @OutputTemplate(context)
                 <div class="m-auto">
                     <ActionLink Action="Edit" Parameters="@($"id=" + context.GitHubCardId.ToString())" ResourceKey="Edit"  />
                     <ActionDialog Header="Delete GitHubCard" Message="Are You Sure You Wish To Delete This GitHubCard?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete" Id="@context.GitHubCardId.ToString()" />
                 </div>
             </Row>
         </Pager>
-
-        @if (PageState.RenderMode == RenderModes.Static)
-        {
-            <!-- GitHub Card Main JS File -->
-            <script src="//cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
-        }
-
     }
     else
     {
@@ -54,6 +49,8 @@ else
 
     List<GitHubCard> _GitHubCards;
     string _columnClasses;
+    string _userTemplate;
+    string _repoTemplate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,23 +58,32 @@ else
         {
             _GitHubCards = await GitHubCardService.GetGitHubCardsAsync(ModuleState.ModuleId);
             _columnClasses = SettingService.GetSetting(ModuleState.Settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
+            _userTemplate = SettingService.GetSetting(ModuleState.Settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
+            _repoTemplate = SettingService.GetSetting(ModuleState.Settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
+
+            foreach (var gitHubCard in _GitHubCards)
+            {
+                var gitHubUser = await GitHubUserService.GetGitHubUserAsync(gitHubCard.Username);
+                if (gitHubUser != null)
+                {
+                    gitHubCard.GitHubUser = gitHubUser;
+                }
+
+                if (!string.IsNullOrEmpty(gitHubCard.Repo))
+                {
+                    var gitHubRepo = await GitHubRepoService.GetGitHubRepoAsync(gitHubCard.Username, gitHubCard.Repo);
+                    if (gitHubRepo != null)
+                    {
+                        gitHubCard.GitHubRepo = gitHubRepo;
+                    };
+                }                
+            }
         }
         catch (Exception ex)
         {
             await logger.LogError(ex, "Error Loading GitHubCard {Error}", ex.Message);
             AddModuleMessage(Localizer["Message.LoadError"], MessageType.Error);
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && PageState.RenderMode == RenderModes.Interactive)
-        {
-            var interop = new Oqtane.UI.Interop(JSRuntime);
-            await interop.IncludeScript("githubcard", $"//cdn.jsdelivr.net/github-cards/latest/widget.js", "", "", "", "head");
-        }
-
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task Delete(GitHubCard GitHubCard)
@@ -100,4 +106,32 @@ else
     {
         return GitHubCard.Repo != null ? $"{GitHubCard.Username}/{GitHubCard.Repo}" : GitHubCard.Username;
     }
+
+    private MarkupString OutputTemplate(GitHubCard GitHubCard)
+    {
+        if (GitHubCard.GitHubRepo != null)
+        {
+            return new MarkupString(TemplateHelper.TokenizeTemplate(_repoTemplate, GitHubCard.GitHubRepo));
+        }
+
+        if (GitHubCard.GitHubUser != null)
+        {
+            return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, GitHubCard.GitHubUser, HireableText(GitHubCard.GitHubUser.Hireable)));
+        }
+
+        return new MarkupString(Localizer.GetString("NotFound"));
+    }
+
+    public string HireableText(bool? Hireable)
+    {
+            if (Hireable != null)
+            {
+                if ((bool)Hireable)
+                {
+                    return Localizer.GetString("Hireable");
+                }
+                return Localizer.GetString("NotHireable");
+            }
+            return string.Empty;
+        }
 }

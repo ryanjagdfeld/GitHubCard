@@ -9,6 +9,16 @@
         <div class="col-sm-9">
             <input id="columnClasses" type="text" class="form-control" @bind="@_columnClasses" />
         </div>
+        <Label Class="col-sm-3" For="userTemplate" HelpText="The template for displaying a GitHub User" ResourceKey="UserTemplate" ResourceType="@resourceType">User Template: </Label>
+        <div class="col-sm-9">
+            <textarea id="userTemplate" rows="8" cols="75" class="form-control" @bind="@_userTemplate" />
+            <button id="reloadUserDefault" class="btn btn-secondary" @onclick="ReloadUserDefaultTemplate">@Localizer.GetString("ReloadDefault")</button>
+        </div>
+        <Label Class="col-sm-3" For="repoTemplate" HelpText="The template for displaying a GitHub Repo" ResourceKey="RepoTemplate" ResourceType="@resourceType">Repo Template: </Label>
+        <div class="col-sm-9">
+            <textarea id="repoTemplate" rows="8" cols="75" class="form-control" @bind="@_repoTemplate" />
+            <button id="reloadRepoDefault" class="btn btn-secondary" @onclick="ReloadRepoDefaultTemplate">@Localizer.GetString("ReloadDefault")</button>
+        </div>
     </div>
 </div>
 
@@ -17,6 +27,8 @@
     public override string Title => "GitHubCard Settings";
 
     string _columnClasses;
+    string _userTemplate;
+    string _repoTemplate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -24,6 +36,8 @@
         {
             Dictionary<string, string> settings = await SettingService.GetModuleSettingsAsync(ModuleState.ModuleId);
             _columnClasses = SettingService.GetSetting(settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
+            _userTemplate = SettingService.GetSetting(settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
+            _repoTemplate = SettingService.GetSetting(settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
         }
         catch (Exception ex)
         {
@@ -37,11 +51,23 @@
         {
             Dictionary<string, string> settings = await SettingService.GetModuleSettingsAsync(ModuleState.ModuleId);
             SettingService.SetSetting(settings, "ColumnClasses", _columnClasses);
+            SettingService.SetSetting(settings, "UserTemplate", _userTemplate);
+            SettingService.SetSetting(settings, "RepoTemplate", _repoTemplate);
             await SettingService.UpdateModuleSettingsAsync(settings, ModuleState.ModuleId);
         }
         catch (Exception ex)
         {
             AddModuleMessage(ex.Message, MessageType.Error);
         }
+    }
+
+    private void ReloadUserDefaultTemplate()
+    {
+        _userTemplate = TemplateHelper.DefaultUserTemplate();
+    }
+
+    private void ReloadRepoDefaultTemplate()
+    {
+        _repoTemplate = TemplateHelper.DefaultRepoTemplate();
     }
 }

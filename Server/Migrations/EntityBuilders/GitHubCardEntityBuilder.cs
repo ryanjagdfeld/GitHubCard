@@ -28,7 +28,6 @@ namespace RyanJagdfeld.Module.GitHubCard.Migrations.EntityBuilders
             ModuleId = AddIntegerColumn(table,"ModuleId");
             Username = AddStringColumn(table, "Username", 255);
             Repo = AddStringColumn(table,"Repo", 255, true);
-            Theme = AddStringColumn(table, "Theme", 255, false, false, "default");
             AddAuditableColumns(table);
             return this;
         }
@@ -37,7 +36,6 @@ namespace RyanJagdfeld.Module.GitHubCard.Migrations.EntityBuilders
         public OperationBuilder<AddColumnOperation> ModuleId { get; set; }
         public OperationBuilder<AddColumnOperation> Username { get; set; }
         public OperationBuilder<AddColumnOperation> Repo { get; set; }
-        public OperationBuilder<AddColumnOperation> Theme { get; set; }
 
     }
 }

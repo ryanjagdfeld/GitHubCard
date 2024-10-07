@@ -53,7 +53,7 @@ namespace RyanJagdfeld.Module.GitHubCard.Manager
             {
                 foreach(var GitHubCard in GitHubCards)
                 {
-                    _GitHubCardRepository.AddGitHubCard(new Models.GitHubCard { ModuleId = module.ModuleId, Username = GitHubCard.Username, Repo = GitHubCard.Repo, Theme = GitHubCard.Theme });
+                    _GitHubCardRepository.AddGitHubCard(new Models.GitHubCard { ModuleId = module.ModuleId, Username = GitHubCard.Username, Repo = GitHubCard.Repo });
                 }
             }
         }
