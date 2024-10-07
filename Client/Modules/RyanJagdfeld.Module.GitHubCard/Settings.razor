@@ -35,7 +35,7 @@
         try
         {
             Dictionary<string, string> settings = await SettingService.GetModuleSettingsAsync(ModuleState.ModuleId);
-            _columnClasses = SettingService.GetSetting(settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
+            _columnClasses = SettingService.GetSetting(settings, "ColumnClasses", "col-lg-6 col-12");
             _userTemplate = SettingService.GetSetting(settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
             _repoTemplate = SettingService.GetSetting(settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
         }
