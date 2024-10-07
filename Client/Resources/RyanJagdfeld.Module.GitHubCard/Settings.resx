@@ -133,6 +133,6 @@
     <value>Repo Templage:</value>
   </data>
   <data name="RepoTemplate.HelpText" xml:space="preserve">
-    <value>The Repo Template for creating the output HTML.  You can use any of the following tokens:  {AvatarUrl}, {Name}, {HomePage}, {Description}, {Language}, {Forks}, {Stars}, {HtmlUrl}.</value>
+    <value>The Repo Template for creating the output HTML.  You can use any of the following tokens:  {AvatarUrl}, {Name}, {HomePage}, {HomePageText}, {Description}, {Language}, {Forks}, {Stars}, {HtmlUrl}.</value>
   </data>
 </root>
