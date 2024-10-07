@@ -18,7 +18,26 @@ namespace RyanJagdfeld.Module.GitHubCard.Services
         public async Task<GitHubUser> GetGitHubUserAsync(string username)
         {
             var url = $"https://api.github.com/users/{username}";
-            return await _httpClient.GetFromJsonAsync<GitHubUser>(url);
+            var response = await _httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<GitHubUser>();
+            }
+            else
+            {
+                // Handle different status codes as needed
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                {
+                    // Handle 404 Not Found
+                    throw new HttpRequestException($"User '{username}' not found.");
+                }
+                else
+                {
+                    // Handle other errors
+                    throw new HttpRequestException($"Request to GitHub API failed with status code {response.StatusCode}.");
+                }
+            }
         }
     }
 }

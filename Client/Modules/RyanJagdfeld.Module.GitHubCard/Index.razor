@@ -114,7 +114,12 @@ else
             return new MarkupString(TemplateHelper.TokenizeTemplate(_repoTemplate, GitHubCard.GitHubRepo));
         }
 
-        return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, GitHubCard.GitHubUser, HireableText(GitHubCard.GitHubUser.Hireable)));
+        if (GitHubCard.GitHubUser != null)
+        {
+            return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, GitHubCard.GitHubUser, HireableText(GitHubCard.GitHubUser.Hireable)));
+        }
+
+        return new MarkupString(Localizer.GetString("NotFound"));
     }
 
     public string HireableText(bool? Hireable)

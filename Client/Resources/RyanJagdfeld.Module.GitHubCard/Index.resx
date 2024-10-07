@@ -150,4 +150,7 @@
   <data name="NotHireable" xml:space="preserve">
     <value>Not available for hire</value>
   </data>
+  <data name="NotFound" xml:space="preserve">
+    <value>&lt;div class='alert alert-danger'&gt;User/Repo not found!&lt;/div&gt;</value>
+  </data>
 </root>
