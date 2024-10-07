@@ -22,5 +22,7 @@ namespace RyanJagdfeld.Module.GitHubCard.Models
         public DateTime ModifiedOn { get; set; }
         [NotMapped]
         public GitHubUser GitHubUser { get; set; }
+        [NotMapped]
+        public GitHubRepo GitHubRepo { get; set; }
     }
 }

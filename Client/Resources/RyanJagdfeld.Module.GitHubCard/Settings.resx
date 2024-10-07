@@ -127,6 +127,12 @@
     <value>User Template:</value>
   </data>
   <data name="UserTemplate.HelpText" xml:space="preserve">
-    <value>The User Template for creating the output HTML.  You can use and of the following tokens:  {AvatarUrl}, {Name}, {HireableText}, {PublicRepos}, {PublicGists}, {Followers}, {Username}, {HtmlUrl}, {Bio}, {Location}</value>
+    <value>The User Template for creating the output HTML.  You can use any of the following tokens:  {AvatarUrl}, {Name}, {HireableText}, {PublicRepos}, {PublicGists}, {Followers}, {Username}, {HtmlUrl}, {Bio}, {Location}.</value>
+  </data>
+  <data name="RepoTemplate.Text" xml:space="preserve">
+    <value>Repo Templage:</value>
+  </data>
+  <data name="RepoTemplate.HelpText" xml:space="preserve">
+    <value>The Repo Template for creating the output HTML.  You can use any of the following tokens:  {AvatarUrl}, {Name}, {HomePage}, {Description}, {Language}, {Forks}, {Stars}, {HtmlUrl}.</value>
   </data>
 </root>

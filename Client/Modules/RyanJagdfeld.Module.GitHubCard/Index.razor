@@ -5,6 +5,7 @@
 @inherits ModuleBase
 @inject IGitHubCardService GitHubCardService
 @inject GitHubUserService GitHubUserService
+@inject GitHubRepoService GitHubRepoService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<Index> Localizer
 @inject ISettingService SettingService
@@ -29,13 +30,6 @@ else
                 </div>
             </Row>
         </Pager>
-
-        @if (PageState.RenderMode == RenderModes.Static)
-        {
-            <!-- GitHub Card Main JS File -->
-            <script src="//cdn.jsdelivr.net/github-cards/latest/widget.js"></script>
-        }
-
     }
     else
     {
@@ -56,6 +50,7 @@ else
     List<GitHubCard> _GitHubCards;
     string _columnClasses;
     string _userTemplate;
+    string _repoTemplate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,8 +58,9 @@ else
         {
             _GitHubCards = await GitHubCardService.GetGitHubCardsAsync(ModuleState.ModuleId);
             _columnClasses = SettingService.GetSetting(ModuleState.Settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
-            _userTemplate = SettingService.GetSetting(ModuleState.Settings, "UserTemplate", TemplateHelper.DefaultTemplate());
-            
+            _userTemplate = SettingService.GetSetting(ModuleState.Settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
+            _repoTemplate = SettingService.GetSetting(ModuleState.Settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
+
             foreach (var gitHubCard in _GitHubCards)
             {
                 var gitHubUser = await GitHubUserService.GetGitHubUserAsync(gitHubCard.Username);
@@ -72,6 +68,15 @@ else
                 {
                     gitHubCard.GitHubUser = gitHubUser;
                 }
+
+                if (!string.IsNullOrEmpty(gitHubCard.Repo))
+                {
+                    var gitHubRepo = await GitHubRepoService.GetGitHubRepoAsync(gitHubCard.Username, gitHubCard.Repo);
+                    if (gitHubRepo != null)
+                    {
+                        gitHubCard.GitHubRepo = gitHubRepo;
+                    };
+                }                
             }
         }
         catch (Exception ex)
@@ -79,17 +84,6 @@ else
             await logger.LogError(ex, "Error Loading GitHubCard {Error}", ex.Message);
             AddModuleMessage(Localizer["Message.LoadError"], MessageType.Error);
         }
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && PageState.RenderMode == RenderModes.Interactive)
-        {
-            var interop = new Oqtane.UI.Interop(JSRuntime);
-            await interop.IncludeScript("githubcard", $"//cdn.jsdelivr.net/github-cards/latest/widget.js", "", "", "", "head");
-        }
-
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     private async Task Delete(GitHubCard GitHubCard)
@@ -115,6 +109,11 @@ else
 
     private MarkupString OutputTemplate(GitHubCard GitHubCard)
     {
+        if (GitHubCard.GitHubRepo != null)
+        {
+            return new MarkupString(TemplateHelper.TokenizeTemplate(_repoTemplate, GitHubCard.GitHubRepo));
+        }
+
         return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, GitHubCard.GitHubUser, HireableText(GitHubCard.GitHubUser.Hireable)));
     }
 
