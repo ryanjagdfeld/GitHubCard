@@ -4,8 +4,7 @@
 @namespace RyanJagdfeld.Module.GitHubCard
 @inherits ModuleBase
 @inject IGitHubCardService GitHubCardService
-@inject GitHubUserService GitHubUserService
-@inject GitHubRepoService GitHubRepoService
+@inject GitHubService GitHubService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<Index> Localizer
 @inject ISettingService SettingService
@@ -70,14 +69,14 @@ else
             {
                 if (!string.IsNullOrEmpty(gitHubCard.Repo))
                 {
-                    var gitHubRepo = await GitHubRepoService.GetGitHubRepoAsync(gitHubCard.Username, gitHubCard.Repo, _accessToken);
+                    var gitHubRepo = await GitHubService.GetGitHubRepoAsync(gitHubCard.Username, gitHubCard.Repo, _accessToken);
                     if (gitHubRepo != null)
                     {
                         gitHubCard.GitHubRepo = gitHubRepo;
                     }
                 }
 
-                var gitHubUser = await GitHubUserService.GetGitHubUserAsync(gitHubCard.Username, _accessToken);
+                var gitHubUser = await GitHubService.GetGitHubUserAsync(gitHubCard.Username, _accessToken);
                 if (gitHubUser != null)
                 {
                     gitHubCard.GitHubUser = gitHubUser;
