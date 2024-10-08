@@ -142,6 +142,6 @@
     <value>A GitHub personal access token. Without authentication, GitHub allows 60 requests per hour from the same IP address. Authenticated requests increase the limit to 5,000 requests per hour.</value>
   </data>
   <data name="TokenCaution" xml:space="preserve">
-    <value>Please only use the token for server hosted applications or development purposes.  It will be exposed to clients if used in production. Users will have different IP addresses, so rate limits don't apply. </value>
+    <value>Please only use the token for server hosted applications or development purposes.  It will be exposed to clients if used in WebAssembly (client). Users will have different IP addresses, so rate limits don't apply. </value>
   </data>
 </root>
