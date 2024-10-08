@@ -45,11 +45,14 @@ namespace RyanJagdfeld.Module.GitHubCard
             <div class='card p-3'>
                 <div class='d-flex align-items-center'>
                     <div class='image'>
-                        <img src='{AvatarUrl}' class='rounded' width='155'>
+                        <img src='{AvatarUrl}' class='img-fluid rounded align-top'>
                     </div>
                     <div class='ms-3 w-100'>
-                        <h4 class='mb-0 mt-0' class='card-title'>{Name}<span>{HireableText}</span></h4>                        
-                        <div class='p-2 mt-2 bg-primary d-flex justify-content-between text-white'>
+                        <h4 class='mb-0 mt-0 card-title'>{Name}</h4>
+                        <div class='p-2 mt-2 card-text'>
+                            {Bio}
+                        </div>
+                        <div class='p-2 mt-2 bg-primary d-flex justify-content-between rounded text-white'>
                             <div class='d-flex flex-column'>
                                 <span>Repos</span>
                                 <span class='text-center'>{PublicRepos}</span>
@@ -64,7 +67,7 @@ namespace RyanJagdfeld.Module.GitHubCard
                             </div>
                         </div>
                         <div class='button mt-2 d-flex flex-row align-items-center'>
-                            <a href='{HtmlUrl}' class='btn btn-sm btn-primary w-100 ml-2' target='_blank'>Follow</a>
+                            <a href='{HtmlUrl}' class='btn btn-primary w-100 ml-2' target='_blank'>Follow</a>
                         </div>
                     </div>
                 </div>
@@ -77,7 +80,7 @@ namespace RyanJagdfeld.Module.GitHubCard
             <div class='card p-3'>
                 <div class='d-flex align-items-center'>
                     <div class='image'>
-                        <img src='{AvatarUrl}' class='rounded' width='155'>
+                        <img src='{AvatarUrl}' class='img-fluid rounded align-top'>
                     </div>
                     <div class='ms-3 w-100 card-body'>
                         <h4 class='mb-0 mt-0 card-title'>{Name}<sup>{Language}</sup></h4>
