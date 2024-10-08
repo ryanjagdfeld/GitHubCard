@@ -10,12 +10,11 @@ namespace RyanJagdfeld.Module.GitHubCard
 {
     public static class TemplateHelper
     {
-        public static string TokenizeTemplate(string template, GitHubUser user, string hireableText)
+        public static string TokenizeTemplate(string template, GitHubUser user)
         {
             return template
                 .Replace("{AvatarUrl}", user.AvatarUrl)
                 .Replace("{Name}", user.Name)
-                .Replace("{HireableText}", hireableText)
                 .Replace("{PublicRepos}", user.PublicRepos.ToString())
                 .Replace("{PublicGists}", user.PublicGists.ToString())
                 .Replace("{Followers}", user.Followers.ToString())
@@ -49,11 +48,10 @@ namespace RyanJagdfeld.Module.GitHubCard
                         <img src='{AvatarUrl}' class='rounded' width='155'>
                     </div>
                     <div class='ms-3 w-100'>
-                        <h4 class='mb-0 mt-0'>{Name}</h4>
-                        <span>{HireableText}</span>
-                        <div class='p-2 mt-2 bg-primary d-flex justify-content-between rounded text-white stats'>
+                        <h4 class='mb-0 mt-0' class='card-title'>{Name}<span>{HireableText}</span></h4>                        
+                        <div class='p-2 mt-2 bg-primary d-flex justify-content-between text-white'>
                             <div class='d-flex flex-column'>
-                                <span >Repos</span>
+                                <span>Repos</span>
                                 <span class='text-center'>{PublicRepos}</span>
                             </div>
                             <div class='d-flex flex-column'>

@@ -120,22 +120,9 @@ else
 
         if (gitHubCard.GitHubUser != null)
         {
-            return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, gitHubCard.GitHubUser, HireableText(gitHubCard.GitHubUser.Hireable)));
+            return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, gitHubCard.GitHubUser));
         }
 
         return new MarkupString(Localizer.GetString("NotFound"));
-    }
-
-    public string HireableText(bool? hireable)
-    {
-        if (hireable != null)
-        {
-            if ((bool)hireable)
-            {
-                return Localizer.GetString("Hireable");
-            }
-            return Localizer.GetString("NotHireable");
-        }
-        return string.Empty;
     }
 }
