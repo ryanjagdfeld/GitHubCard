@@ -4,8 +4,7 @@
 @namespace RyanJagdfeld.Module.GitHubCard
 @inherits ModuleBase
 @inject IGitHubCardService GitHubCardService
-@inject GitHubUserService GitHubUserService
-@inject GitHubRepoService GitHubRepoService
+@inject GitHubService GitHubService
 @inject NavigationManager NavigationManager
 @inject IStringLocalizer<Index> Localizer
 @inject ISettingService SettingService
@@ -16,17 +15,21 @@
 }
 else
 {
-    <ActionLink Action="Add" Security="SecurityAccessLevel.Edit" Text="Add GitHubCard" ResourceKey="Add" />
-    <br />
-    <br />
-    @if (@_GitHubCards.Count != 0)
+    @if (PageState.EditMode)
+    {
+        <ActionLink Action="Add" Security="SecurityAccessLevel.Edit" Text="Add GitHubCard" ResourceKey="Add" />
+    }
+    @if (_GitHubCards.Count != 0)
     {
         <Pager Items="@_GitHubCards" Format="Grid" ColumnClass="@_columnClasses">
             <Row>
                 @OutputTemplate(context)
                 <div class="m-auto">
-                    <ActionLink Action="Edit" Parameters="@($"id=" + context.GitHubCardId.ToString())" ResourceKey="Edit"  />
-                    <ActionDialog Header="Delete GitHubCard" Message="Are You Sure You Wish To Delete This GitHubCard?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete" Id="@context.GitHubCardId.ToString()" />
+                    @if (PageState.EditMode)
+                    {
+                        <ActionLink Action="Edit" Parameters="@($"id=" + context.GitHubCardId.ToString())" ResourceKey="Edit" Security="SecurityAccessLevel.Edit" />
+                        <ActionDialog Header="Delete GitHubCard" Message="Are You Sure You Wish To Delete This GitHubCard?" Action="Delete" Security="SecurityAccessLevel.Edit" Class="btn btn-danger" OnClick="@(async () => await Delete(context))" ResourceKey="Delete" Id="@context.GitHubCardId.ToString()" />
+                    }
                 </div>
             </Row>
         </Pager>
@@ -36,11 +39,8 @@ else
         <p>@Localizer["Message.DisplayNone"]</p>
     }
 }
-
+ 
 @code {
-    // uncomment the following line to use Static render mode for this component
-    //public override string RenderMode => RenderModes.Static;
-
     public override List<Resource> Resources => new List<Resource>()
     {
         new Resource { ResourceType = ResourceType.Stylesheet, Url = ModulePath() + "Module.css" },
@@ -51,6 +51,7 @@ else
     string _columnClasses;
     string _userTemplate;
     string _repoTemplate;
+    string _accessToken;
 
     protected override async Task OnInitializedAsync()
     {
@@ -60,23 +61,24 @@ else
             _columnClasses = SettingService.GetSetting(ModuleState.Settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
             _userTemplate = SettingService.GetSetting(ModuleState.Settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
             _repoTemplate = SettingService.GetSetting(ModuleState.Settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
+            _accessToken = SettingService.GetSetting(ModuleState.Settings, "AccessToken", string.Empty);
 
             foreach (var gitHubCard in _GitHubCards)
             {
-                var gitHubUser = await GitHubUserService.GetGitHubUserAsync(gitHubCard.Username);
+                if (!string.IsNullOrEmpty(gitHubCard.Repo))
+                {
+                    var gitHubRepo = await GitHubService.GetGitHubRepoAsync(gitHubCard.Username, gitHubCard.Repo, _accessToken);
+                    if (gitHubRepo != null)
+                    {
+                        gitHubCard.GitHubRepo = gitHubRepo;
+                    }
+                }
+
+                var gitHubUser = await GitHubService.GetGitHubUserAsync(gitHubCard.Username, _accessToken);
                 if (gitHubUser != null)
                 {
                     gitHubCard.GitHubUser = gitHubUser;
                 }
-
-                if (!string.IsNullOrEmpty(gitHubCard.Repo))
-                {
-                    var gitHubRepo = await GitHubRepoService.GetGitHubRepoAsync(gitHubCard.Username, gitHubCard.Repo);
-                    if (gitHubRepo != null)
-                    {
-                        gitHubCard.GitHubRepo = gitHubRepo;
-                    };
-                }                
             }
         }
         catch (Exception ex)
@@ -86,52 +88,39 @@ else
         }
     }
 
-    private async Task Delete(GitHubCard GitHubCard)
+    private async Task Delete(GitHubCard gitHubCard)
     {
         try
         {
-            await GitHubCardService.DeleteGitHubCardAsync(GitHubCard.GitHubCardId, ModuleState.ModuleId);
-            await logger.LogInformation("GitHubCard Deleted {GitHubCard}", GitHubCard);
+            await GitHubCardService.DeleteGitHubCardAsync(gitHubCard.GitHubCardId, ModuleState.ModuleId);
+            await logger.LogInformation("GitHubCard Deleted {GitHubCard}", gitHubCard);
             _GitHubCards = await GitHubCardService.GetGitHubCardsAsync(ModuleState.ModuleId);
             StateHasChanged();
         }
         catch (Exception ex)
         {
-            await logger.LogError(ex, "Error Deleting GitHubCard {GitHubCard} {Error}", GitHubCard, ex.Message);
+            await logger.LogError(ex, "Error Deleting GitHubCard {GitHubCard} {Error}", gitHubCard, ex.Message);
             AddModuleMessage(Localizer["Message.DeleteError"], MessageType.Error);
         }
     }
 
-    private string FullEntry(GitHubCard GitHubCard)
+    private string FullEntry(GitHubCard gitHubCard)
     {
-        return GitHubCard.Repo != null ? $"{GitHubCard.Username}/{GitHubCard.Repo}" : GitHubCard.Username;
+        return gitHubCard.Repo != null ? $"{gitHubCard.Username}/{gitHubCard.Repo}" : gitHubCard.Username;
     }
 
-    private MarkupString OutputTemplate(GitHubCard GitHubCard)
+    private MarkupString OutputTemplate(GitHubCard gitHubCard)
     {
-        if (GitHubCard.GitHubRepo != null)
+        if (gitHubCard.GitHubRepo != null)
         {
-            return new MarkupString(TemplateHelper.TokenizeTemplate(_repoTemplate, GitHubCard.GitHubRepo));
+            return new MarkupString(TemplateHelper.TokenizeTemplate(_repoTemplate, gitHubCard.GitHubRepo));
         }
 
-        if (GitHubCard.GitHubUser != null)
+        if (gitHubCard.GitHubUser != null)
         {
-            return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, GitHubCard.GitHubUser, HireableText(GitHubCard.GitHubUser.Hireable)));
+            return new MarkupString(TemplateHelper.TokenizeTemplate(_userTemplate, gitHubCard.GitHubUser));
         }
 
         return new MarkupString(Localizer.GetString("NotFound"));
     }
-
-    public string HireableText(bool? Hireable)
-    {
-            if (Hireable != null)
-            {
-                if ((bool)Hireable)
-                {
-                    return Localizer.GetString("Hireable");
-                }
-                return Localizer.GetString("NotHireable");
-            }
-            return string.Empty;
-        }
 }

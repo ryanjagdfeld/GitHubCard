@@ -2,11 +2,11 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>RyanJagdfeld.Module.GitHubCard</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <authors>RyanJagdfeld</authors>
     <owners>RyanJagdfeld</owners>
     <title>GitHubCard</title>
-    <description>A module for displaying GitHub cards by lepture.</description>
+    <description>A module for displaying GitHub cards of profiles and repos.</description>
     <copyright>RyanJagdfeld</copyright>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">MIT</license>
