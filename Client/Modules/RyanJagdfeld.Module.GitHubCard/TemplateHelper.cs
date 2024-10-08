@@ -85,6 +85,7 @@ namespace RyanJagdfeld.Module.GitHubCard
                         <h4 class='mb-0 mt-0 card-title'>{Name}<sup>{Language}</sup></h4>
                         <div class='p-2 mt-2 card-text'>
                             {Description} - <a href='{HomePage}' target='_blank'>{HomePageText}</a>
+                        </div>
                         <div class='button mt-2 d-flex flex-row justify-content-between w-100'>
                             <div class='d-flex flex-column'>
                                 <span>Forks</span>
