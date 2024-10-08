@@ -9,10 +9,14 @@ namespace RyanJagdfeld.Module.GitHubCard.Services
     {
         private readonly HttpClient _httpClient;
 
-        public GitHubRepoService(HttpClient httpClient)
+        public GitHubRepoService(HttpClient httpClient, string githubToken)
         {
             _httpClient = httpClient;
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "GitHubCardApp");
+            if (!string.IsNullOrEmpty(githubToken))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", githubToken);
+            }
         }
 
         public async Task<GitHubRepo> GetGitHubRepoAsync(string username, string repo)
