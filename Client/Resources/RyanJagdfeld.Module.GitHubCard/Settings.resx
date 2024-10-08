@@ -135,4 +135,13 @@
   <data name="RepoTemplate.HelpText" xml:space="preserve">
     <value>The Repo Template for creating the output HTML.  You can use any of the following tokens:  {AvatarUrl}, {Name}, {HomePage}, {HomePageText}, {Description}, {Language}, {Forks}, {Stars}, {HtmlUrl}.</value>
   </data>
+  <data name="AccessToken.Text" xml:space="preserve">
+    <value>Access Token:</value>
+  </data>
+  <data name="AccessToken.HelpText" xml:space="preserve">
+    <value>A GitHub personal access token. Without authentication, GitHub allows 60 requests per hour from the same IP address. Authenticated requests increase the limit to 5,000 requests per hour.</value>
+  </data>
+  <data name="TokenCaution" xml:space="preserve">
+    <value>Please only use the token for server hosted applications or development purposes.  It will be exposed to clients if used in production. Users will have different IP addresses, so rate limits don't apply. </value>
+  </data>
 </root>

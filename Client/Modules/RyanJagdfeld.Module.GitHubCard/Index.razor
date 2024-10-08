@@ -54,6 +54,7 @@ else
     string _columnClasses;
     string _userTemplate;
     string _repoTemplate;
+    string _accessToken;
 
     protected override async Task OnInitializedAsync()
     {
@@ -63,19 +64,20 @@ else
             _columnClasses = SettingService.GetSetting(ModuleState.Settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
             _userTemplate = SettingService.GetSetting(ModuleState.Settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
             _repoTemplate = SettingService.GetSetting(ModuleState.Settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
+            _accessToken = SettingService.GetSetting(ModuleState.Settings, "AccessToken", string.Empty);
 
             foreach (var gitHubCard in _GitHubCards)
             {
                 if (!string.IsNullOrEmpty(gitHubCard.Repo))
                 {
-                    var gitHubRepo = await GitHubRepoService.GetGitHubRepoAsync(gitHubCard.Username, gitHubCard.Repo);
+                    var gitHubRepo = await GitHubRepoService.GetGitHubRepoAsync(gitHubCard.Username, gitHubCard.Repo, _accessToken);
                     if (gitHubRepo != null)
                     {
                         gitHubCard.GitHubRepo = gitHubRepo;
                     }
                 }
 
-                var gitHubUser = await GitHubUserService.GetGitHubUserAsync(gitHubCard.Username);
+                var gitHubUser = await GitHubUserService.GetGitHubUserAsync(gitHubCard.Username, _accessToken);
                 if (gitHubUser != null)
                 {
                     gitHubCard.GitHubUser = gitHubUser;

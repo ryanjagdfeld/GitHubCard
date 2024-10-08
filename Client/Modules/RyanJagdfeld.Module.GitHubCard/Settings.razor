@@ -19,6 +19,11 @@
             <textarea id="repoTemplate" rows="8" cols="75" class="form-control" @bind="@_repoTemplate" />
             <button id="reloadRepoDefault" class="btn btn-secondary" @onclick:preventDefault @onclick="ReloadRepoDefaultTemplate">@Localizer.GetString("ReloadDefault")</button>
         </div>
+        <div class="alert alert-warning">@Localizer.GetString("TokenCaution")</div>
+        <Label Class="col-sm-3" For="accessToken" HelpText="A GitHub personal access token. Without authentication, GitHub allows 60 requests per hour from the same IP address. Authenticated requests increase the limit to 5,000 requests per hour." ResourceKey="AccessToken" ResourceType="@resourceType">GitHub Access Token: </Label>
+        <div class="col-sm-9">
+            <input id="accessToken" type="text" class="form-control" @bind="@_accessToken" />
+        </div>
     </div>
 </div>
 
@@ -26,6 +31,7 @@
     private string resourceType = "RyanJagdfeld.Module.GitHubCard.Settings, RyanJagdfeld.Module.GitHubCard.Client.Oqtane"; // for localization
     public override string Title => "GitHubCard Settings";
 
+    string _accessToken;
     string _columnClasses;
     string _userTemplate;
     string _repoTemplate;
@@ -38,6 +44,7 @@
             _columnClasses = SettingService.GetSetting(settings, "ColumnClasses", "col-lg-6 col-12");
             _userTemplate = SettingService.GetSetting(settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
             _repoTemplate = SettingService.GetSetting(settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
+            _accessToken = SettingService.GetSetting(settings, "AccessToken", string.Empty);
         }
         catch (Exception ex)
         {
@@ -53,6 +60,7 @@
             SettingService.SetSetting(settings, "ColumnClasses", _columnClasses);
             SettingService.SetSetting(settings, "UserTemplate", _userTemplate);
             SettingService.SetSetting(settings, "RepoTemplate", _repoTemplate);
+            SettingService.SetSetting(settings, "AccessToken", _accessToken);
             await SettingService.UpdateModuleSettingsAsync(settings, ModuleState.ModuleId);
         }
         catch (Exception ex)

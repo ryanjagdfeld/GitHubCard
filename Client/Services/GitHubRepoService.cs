@@ -1,6 +1,7 @@
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using RyanJagdfeld.Module.GitHubCard.Models;
 
 namespace RyanJagdfeld.Module.GitHubCard.Services
@@ -9,19 +10,22 @@ namespace RyanJagdfeld.Module.GitHubCard.Services
     {
         private readonly HttpClient _httpClient;
 
-        public GitHubRepoService(HttpClient httpClient, string githubToken)
+        public GitHubRepoService(HttpClient httpClient)
         {
             _httpClient = httpClient;
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "GitHubCardApp");
+            
+            
+        }
+
+        public async Task<GitHubRepo> GetGitHubRepoAsync(string username, string repo, string githubToken)
+        {
+            var url = $"https://api.github.com/repos/{username}/{repo}";
             if (!string.IsNullOrEmpty(githubToken))
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", githubToken);
             }
-        }
 
-        public async Task<GitHubRepo> GetGitHubRepoAsync(string username, string repo)
-        {
-            var url = $"https://api.github.com/repos/{username}/{repo}";
             var response = await _httpClient.GetAsync(url);
             
             if (response.IsSuccessStatusCode)
