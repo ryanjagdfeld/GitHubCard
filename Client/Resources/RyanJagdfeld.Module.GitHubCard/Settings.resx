@@ -121,7 +121,7 @@
     <value>Column CSS Class:</value>
   </data>
   <data name="ColumnClass.HelpText" xml:space="preserve">
-    <value>Bootstrap classes for each column in the grid. NOTE: The card width can outgrow the box of the grid.</value>
+    <value>Bootstrap class(es) for each column in the grid. </value>
   </data>
   <data name="UserTemplate.Text" xml:space="preserve">
     <value>User Template:</value>
@@ -143,5 +143,17 @@
   </data>
   <data name="TokenCaution" xml:space="preserve">
     <value>Please only use the token for server hosted applications or development purposes.  It will be exposed to clients if used in WebAssembly (client).  </value>
+  </data>
+  <data name="RowClasses.Text" xml:space="preserve">
+    <value>Row CSS Class:</value>
+  </data>
+  <data name="RowClasses.HelpText" xml:space="preserve">
+    <value>Bootstrap class(es) for the parent row of the grid.</value>
+  </data>
+  <data name="Classes.Text" xml:space="preserve">
+    <value>Parent CSS Class</value>
+  </data>
+  <data name="Classes.HelpText" xml:space="preserve">
+    <value>Bootstrap class(es) for the parent div tag of the grid.</value>
   </data>
 </root>
