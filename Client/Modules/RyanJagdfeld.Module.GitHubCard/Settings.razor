@@ -5,7 +5,15 @@
 
 <div class="container">
     <div class="row mb-1 align-items-center">
-        <Label Class="col-sm-3" For="columnClasses" HelpText="Bootstrap classes for each column in the grid. NOTE: The card width can outgrow the box of the grid." ResourceKey="ColumnClass" ResourceType="@resourceType">Column CSS Class: </Label>
+        <Label Class="col-sm-3" For="classes" HelpText="Bootstrap class(es) for the parent div tag of the grid." ResourceKey="Class" ResourceType="@resourceType">Parent CSS Class: </Label>
+        <div class="col-sm-9">
+            <input id="classes" type="text" class="form-control" @bind="@_classes" />
+        </div>
+        <Label Class="col-sm-3" For="rowClasses" HelpText="Bootstrap class(es) for the parent row of the grid." ResourceKey="RowClass" ResourceType="@resourceType">Row CSS Class: </Label>
+        <div class="col-sm-9">
+            <input id="rowClasses" type="text" class="form-control" @bind="@_rowClasses" />
+        </div>
+        <Label Class="col-sm-3" For="columnClasses" HelpText="Bootstrap class(es) for each column in the grid." ResourceKey="ColumnClass" ResourceType="@resourceType">Column CSS Class: </Label>
         <div class="col-sm-9">
             <input id="columnClasses" type="text" class="form-control" @bind="@_columnClasses" />
         </div>
@@ -32,6 +40,8 @@
     public override string Title => "GitHubCard Settings";
 
     string _accessToken;
+    string _classes;
+    string _rowClasses;
     string _columnClasses;
     string _userTemplate;
     string _repoTemplate;
@@ -41,6 +51,8 @@
         try
         {
             Dictionary<string, string> settings = await SettingService.GetModuleSettingsAsync(ModuleState.ModuleId);
+            _classes = SettingService.GetSetting(settings, "Classes", "container-fluid");
+            _rowClasses = SettingService.GetSetting(settings, "RowClasses", "row");
             _columnClasses = SettingService.GetSetting(settings, "ColumnClasses", "col-lg-6 col-12");
             _userTemplate = SettingService.GetSetting(settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
             _repoTemplate = SettingService.GetSetting(settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
@@ -57,6 +69,8 @@
         try
         {
             Dictionary<string, string> settings = await SettingService.GetModuleSettingsAsync(ModuleState.ModuleId);
+            SettingService.SetSetting(settings, "Classes", _classes);
+            SettingService.SetSetting(settings, "RowClasses", _rowClasses);
             SettingService.SetSetting(settings, "ColumnClasses", _columnClasses);
             SettingService.SetSetting(settings, "UserTemplate", _userTemplate);
             SettingService.SetSetting(settings, "RepoTemplate", _repoTemplate);

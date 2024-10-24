@@ -21,7 +21,7 @@ else
     }
     @if (_GitHubCards.Count != 0)
     {
-        <Pager Items="@_GitHubCards" Format="Grid" ColumnClass="@_columnClasses">
+        <Pager Items="@_GitHubCards" Format="Grid" Class="@_classes" RowClass="@_rowClasses" ColumnClass="@_columnClasses">
             <Row>
                 @OutputTemplate(context)
                 <div class="m-auto">
@@ -48,6 +48,8 @@ else
     };
 
     List<GitHubCard> _GitHubCards;
+    string _classes;
+    string _rowClasses;
     string _columnClasses;
     string _userTemplate;
     string _repoTemplate;
@@ -58,7 +60,9 @@ else
         try
         {
             _GitHubCards = await GitHubCardService.GetGitHubCardsAsync(ModuleState.ModuleId);
-            _columnClasses = SettingService.GetSetting(ModuleState.Settings, "ColumnClasses", "col-xl-4 col-lg-6 col-12");
+            _classes = SettingService.GetSetting(ModuleState.Settings, "Classes", "container-fluid");
+            _rowClasses = SettingService.GetSetting(ModuleState.Settings, "RowClasses", "row");
+            _columnClasses = SettingService.GetSetting(ModuleState.Settings, "ColumnClasses", "col-lg-6 col-12");
             _userTemplate = SettingService.GetSetting(ModuleState.Settings, "UserTemplate", TemplateHelper.DefaultUserTemplate());
             _repoTemplate = SettingService.GetSetting(ModuleState.Settings, "RepoTemplate", TemplateHelper.DefaultRepoTemplate());
             _accessToken = SettingService.GetSetting(ModuleState.Settings, "AccessToken", string.Empty);
